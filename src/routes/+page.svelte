@@ -1,8 +1,29 @@
 <script lang="ts">
 	import Container from "./container.svelte";
 
+	import { onMount } from "svelte";
+
+	let darkMode: boolean = false;
+
+	// Load user preference from localStorage
+	onMount(() => {
+		darkMode = localStorage.getItem("darkMode") === "true";
+		updateTheme();
+	});
+
+	function toggleDarkMode() {
+		darkMode = !darkMode;
+		localStorage.setItem("darkMode", darkMode + "");
+		updateTheme();
+	}
+
+	function updateTheme() {
+		document.documentElement.classList.toggle("dark-mode", darkMode);
+	}
+
 	// Initial value of the slider
 	let sliderValue = 0;
+	let currentlyRunning = false;
 
 	const input = [
 		"1163751742",
@@ -18,6 +39,7 @@
 	];
 
 	function init() {
+		currentlyRunning = false;
 		return input.map((i) =>
 			i.split("").map((j) => ({
 				num: parseInt(j),
@@ -26,6 +48,8 @@
 			})),
 		);
 	}
+
+	$: console.log("currentlyRunning", currentlyRunning);
 
 	let items = init();
 
@@ -59,14 +83,31 @@
 	};
 
 	function runAlgorithm(interval: number) {
-		let pos: Position = { x: 0, y: 0 };
-		slowAlgorithm(pos, interval);
+		console.log("riun", currentlyRunning);
+
+		if (currentlyRunning) {
+			// interupt it
+			currentlyRunning = false;
+			let int = setInterval(() => {
+				if (currentlyRunning) {
+					currentlyRunning = false;
+					clearInterval(int);
+					runAlgorithm(interval);
+				}
+			}, 100);
+		} else {
+			items = init();
+			currentlyRunning = true;
+			slowAlgorithm({ x: 0, y: 0 }, interval);
+		}
 	}
 
 	function slowAlgorithm(pos: Position, interval: number) {
 		let curPos = updateCell(pos.x, pos.y, {
 			visited: true,
 		});
+
+		// console.log("here", currentlyRunning);
 
 		let min;
 		let direction = { x: 0, y: 0 };
@@ -114,6 +155,11 @@
 			pos = size;
 		}
 
+		if (!currentlyRunning) {
+			currentlyRunning = true;
+			return;
+		}
+
 		if (size.x != pos.x || size.y != pos.y) {
 			if (interval <= 0) slowAlgorithm(pos, interval);
 			else setTimeout(() => slowAlgorithm(pos, interval), interval);
@@ -130,25 +176,41 @@
 	<div class="block flex" style="align-items: center;">
 		<button class="nice-button" on:click={() => runAlgorithm(sliderValue)}
 			>Start</button
-		>
-		<button class="nice-button" on:click={() => (items = init())}
+		><button class="nice-button" on:click={() => (items = init())}
 			>Reset</button
 		>
+		<button class="nice-button" on:click={toggleDarkMode}>
+			{darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+		</button>
+	</div>
+
+	<div class="block flex" style="align-items: center;">
 		<div class="flex">
-			<label for="slider">Delay: {sliderValue}</label>
+			<label for="slider" style="width: 85px;">Delay: {sliderValue}</label
+			>
 			<input
 				id="slider"
 				type="range"
 				min="0"
-				max="1000"
+				max="400"
 				bind:value={sliderValue}
 			/>
 		</div>
 	</div>
-
 	<div class="block flex">
 		<Container {items} classes={"a"} param={"num"} />
 		<Container {items} classes={"b"} param={"sum"} />
+	</div>
+
+	<div class="block flex" style="align-items: center;">
+		<a
+			class="nice-button"
+			target="_blank"
+			rel="noopener noreferrer"
+			href="https://github.com/IIVioletKingII/DijkstrasAlogirthm/tree/main/src/routes"
+		>
+			<span class="material-icons">open_in_new</span> View code here
+		</a>
 	</div>
 </div>
 
@@ -159,7 +221,8 @@
 	}
 
 	.header {
-		margin: 1rem;
+		padding-top: 1rem;
+		margin: 0 1rem 1rem;
 		font-weight: 600;
 		font-size: 32px;
 	}
@@ -174,6 +237,13 @@
 		flex-direction: row;
 		flex-wrap: wrap;
 		gap: 1rem;
+	}
+
+	a.nice-button {
+		display: flex;
+		text-decoration: none;
+		align-items: center;
+		gap: 8px;
 	}
 
 	.nice-button {

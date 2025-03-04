@@ -31,10 +31,11 @@
 		border: none;
 		border-collapse: collapse;
 	}
+
 	.container {
 		width: fit-content;
 		padding: 1rem;
-		background-color: bisque;
+		background-color: var(--card-background);
 		border-radius: 1rem;
 
 		font-size: 24px;
