@@ -27,9 +27,13 @@ export default {
 		// Paths for static sites
 		adapter: adapter({
 			pages: 'docs',   // Specifies where to output the build
-			assets: 'docs',  // Specifies the folder for assets
+			// assets: 'docs',  // Specifies the folder for assets
 			fallback: 'index.html',  // Set to 'index.html' if you want a fallback
 		}),
+		paths: {
+			base: '/DijkstrasAlogirthm',  // The subdirectory where your app is hosted
+		},
+
 
 		// // Optional: If you want to adjust Vite-specific settings (e.g., for dev or build process)
 		// vite: {
