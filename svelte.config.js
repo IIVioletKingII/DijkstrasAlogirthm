@@ -18,13 +18,13 @@ const config = {
 		adapter: adapter({
 			pages: 'docs',   // Specifies where to output the build
 			assets: 'docs',  // Specifies the folder for assets
-			fallback: '404.html',  // Set to 'index.html' if you want a fallback
+			fallback: 'index.html',  // Set to 'index.html' if you want a fallback
 			precompress: false,
-			strict: true
+			strict: false
 		}),
 		paths: {
-			// base: '/DijkstrasAlogirthm',  // The subdirectory where your app is hosted
-			base: process.argv.includes('dev') ? '' : process.env.BASE_PATH
+			base: '/DijkstrasAlogirthm',  // The subdirectory where your app is hosted
+			// base: process.argv.includes('dev') ? '' : process.env.BASE_PATH
 		},
 
 
